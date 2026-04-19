@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BAM Adoption Hub | Power Platform</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <aside class="sidebar">
@@ -26,17 +27,20 @@
                 <h2>Welkom bij de Adoption Hub</h2>
             </div>
             <div class="grid" id="stats-grid">
-                <div class="card">
-                    <div class="card-title">Geplande Workshops</div>
-                    <div id="count-workshops" style="font-size: 2rem; font-weight: 700;">0</div>
+                <div class="card clickable-card" onclick="navigateTo('workshops')">
+                    <div class="card-title">📅 Geplande Workshops</div>
+                    <div id="count-workshops" class="stat-number">0</div>
+                    <p class="card-footer">Klik voor details →</p>
                 </div>
-                <div class="card">
-                    <div class="card-title">Business Contacten</div>
-                    <div id="count-contacts" style="font-size: 2rem; font-weight: 700;">0</div>
+                <div class="card clickable-card" onclick="navigateTo('contacts')">
+                    <div class="card-title">👥 Business Contacten</div>
+                    <div id="count-contacts" class="stat-number">0</div>
+                    <p class="card-footer">Klik voor details →</p>
                 </div>
-                <div class="card">
-                    <div class="card-title">Nieuwe Updates</div>
-                    <div id="count-updates" style="font-size: 2rem; font-weight: 700;">0</div>
+                <div class="card clickable-card" onclick="navigateTo('updates')">
+                    <div class="card-title">📡 Nieuwe Updates</div>
+                    <div id="count-updates" class="stat-number">0</div>
+                    <p class="card-footer">Klik voor details →</p>
                 </div>
             </div>
         </section>
@@ -63,24 +67,34 @@
         <section id="view-updates" class="view hidden">
             <div class="header-row">
                 <h2>Microsoft Update Radar</h2>
-                <button class="btn btn-primary" onclick="showModal('update-modal')">+ Nieuwe Update</button>
+                <button class="btn btn-primary" id="fetch-roadmap-btn">📡 Roadmap Ophalen</button>
             </div>
-            <div class="grid" id="updates-grid"></div>
+            
+            <div class="tabs-container">
+                <div class="tabs">
+                    <div class="tab-item active" data-tab="all">Alles</div>
+                    <div class="tab-item" data-tab="Copilot">Copilot</div>
+                    <div class="tab-item" data-tab="Copilot Studio">Copilot Studio</div>
+                    <div class="tab-item" data-tab="Power Platform">Power Platform</div>
+                </div>
+                <div id="updates-grid" class="grid" style="margin-top: 24px;"></div>
+            </div>
         </section>
     </main>
 
-    <!-- Modals -->
+    <!-- Workshop Modal -->
     <div id="workshop-modal" class="modal">
         <div class="modal-content">
-            <h3>Nieuwe Sessie Toevoegen</h3><br>
+            <h3 id="workshop-modal-title">Nieuwe Sessie Toevoegen</h3><br>
             <form id="workshop-form">
+                <input type="hidden" name="id" id="edit-workshop-id">
                 <div class="form-group">
                     <label>Titel</label>
-                    <input type="text" name="title" required>
+                    <input type="text" name="title" id="workshop-title" required>
                 </div>
                 <div class="form-group">
                     <label>Type</label>
-                    <select name="type">
+                    <select name="type" id="workshop-type">
                         <option value="Workshop">Workshop</option>
                         <option value="Demo">Demo</option>
                         <option value="Inloopspreekuur">Inloopspreekuur</option>
@@ -88,11 +102,23 @@
                 </div>
                 <div class="form-group">
                     <label>Datum & Tijd</label>
-                    <input type="datetime-local" name="date" required>
+                    <input type="datetime-local" name="date" id="workshop-date" required>
                 </div>
                 <div class="form-group">
                     <label>Locatie</label>
-                    <input type="text" name="location">
+                    <input type="text" name="location" id="workshop-location">
+                </div>
+                <div class="form-group">
+                    <label>Beschrijving</label>
+                    <textarea name="description" id="workshop-description"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select name="status" id="workshop-status">
+                        <option value="Planned">Gepland</option>
+                        <option value="Completed">Afgerond</option>
+                        <option value="Cancelled">Geannuleerd</option>
+                    </select>
                 </div>
                 <button type="submit" class="btn btn-primary">Opslaan</button>
                 <button type="button" class="btn" onclick="hideModal('workshop-modal')">Annuleren</button>
@@ -100,7 +126,74 @@
         </div>
     </div>
 
-    <!-- More modals can be added here -->
+    <!-- Contact Modal -->
+    <div id="contact-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="contact-modal-title">Nieuw Contact Toevoegen</h3><br>
+            <form id="contact-form">
+                <input type="hidden" name="id" id="edit-contact-id">
+                <div class="form-group">
+                    <label>Naam</label>
+                    <input type="text" name="name" id="contact-name" required>
+                </div>
+                <div class="form-group">
+                    <label>E-mail</label>
+                    <input type="email" name="email" id="contact-email" required>
+                </div>
+                <div class="form-group">
+                    <label>Afdeling</label>
+                    <input type="text" name="department" id="contact-department">
+                </div>
+                <div class="form-group">
+                    <label>Niveau</label>
+                    <select name="level" id="contact-level">
+                        <option value="Beginner">Beginner</option>
+                        <option value="Maker">Maker</option>
+                        <option value="Expert">Expert</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Interesses</label>
+                    <input type="text" name="interests" id="contact-interests" placeholder="bijv. AI, Automatisering">
+                </div>
+                <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" name="is_champion" id="contact-is-champion" style="width: auto;">
+                    <label style="margin-bottom: 0;">BAM Champion?</label>
+                </div>
+                <br>
+                <button type="submit" class="btn btn-primary">Opslaan</button>
+                <button type="button" class="btn" onclick="hideModal('contact-modal')">Annuleren</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Update Modal -->
+    <div id="update-modal" class="modal">
+        <div class="modal-content">
+            <h3>Nieuwe Update Toevoegen</h3><br>
+            <form id="update-form">
+                <div class="form-group">
+                    <label>Titel</label>
+                    <input type="text" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label>Categorie</label>
+                    <select name="category">
+                        <option value="General">Algemeen</option>
+                        <option value="Copilot">Copilot</option>
+                        <option value="Copilot Studio">Copilot Studio</option>
+                        <option value="Power Platform">Power Platform</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>BAM Impact</label>
+                    <textarea name="bam_impact"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Opslaan</button>
+                <button type="button" class="btn" onclick="hideModal('update-modal')">Annuleren</button>
+            </form>
+        </div>
+    </div>
 
     <script src="app.js"></script>
 </body>

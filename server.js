@@ -37,6 +37,15 @@ app.post('/api/workshops', (req, res) => {
         });
 });
 
+app.put('/api/workshops/:id', (req, res) => {
+    const { title, type, date, location, description, max_participants, status } = req.body;
+    db.run(`UPDATE workshops SET title = ?, type = ?, date = ?, location = ?, description = ?, max_participants = ?, status = ? WHERE id = ?`,
+        [title, type, date, location, description, max_participants, status, req.params.id], function(err) {
+            if (err) return res.status(500).json({ error: err.message });
+            res.json({ updated: this.changes });
+        });
+});
+
 // Contacts (CRM)
 app.get('/api/contacts', (req, res) => {
     db.all('SELECT * FROM contacts ORDER BY name ASC', [], (err, rows) => {
@@ -51,6 +60,15 @@ app.post('/api/contacts', (req, res) => {
         [name, email, department, level, interests, is_champion], function(err) {
             if (err) return res.status(500).json({ error: err.message });
             res.json({ id: this.lastID });
+        });
+});
+
+app.put('/api/contacts/:id', (req, res) => {
+    const { name, email, department, level, interests, is_champion } = req.body;
+    db.run(`UPDATE contacts SET name = ?, email = ?, department = ?, level = ?, interests = ?, is_champion = ? WHERE id = ?`,
+        [name, email, department, level, interests, is_champion, req.params.id], function(err) {
+            if (err) return res.status(500).json({ error: err.message });
+            res.json({ updated: this.changes });
         });
 });
 
