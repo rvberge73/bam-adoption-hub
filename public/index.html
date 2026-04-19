@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BAM Adoption Hub | Power Platform</title>
+    <title>BAM Adoption Hub | Power Platform Enterprise</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
     <aside class="sidebar">
         <div class="sidebar-header">
             <h1>BAM ADOPTION HUB</h1>
+            <p style="font-size: 0.7rem; color: #64748b; letter-spacing: 1px;">ENTERPRISE EDITION</p>
         </div>
         <nav>
             <div class="nav-item active" data-view="dashboard">📊 Dashboard</div>
@@ -18,29 +19,46 @@
             <div class="nav-item" data-view="contacts">👥 Business CRM</div>
             <div class="nav-item" data-view="updates">📡 Update Radar</div>
         </nav>
+        <div class="sidebar-footer" style="margin-top: auto; padding: 32px; font-size: 0.75rem; color: #94a3b8; border-top: 1px solid rgba(255,255,255,0.1);">
+            v2.2 - Strategisch Adoptie Instrument
+        </div>
     </aside>
 
     <main class="main-content">
         <!-- Dashboard View -->
         <section id="view-dashboard" class="view">
             <div class="header-row">
-                <h2>Welkom bij de Adoption Hub</h2>
+                <h2>BAM Adoptie Overview</h2>
             </div>
             <div class="grid" id="stats-grid">
                 <div class="card clickable-card" onclick="navigateTo('workshops')">
-                    <div class="card-title">📅 Geplande Workshops</div>
+                    <div class="card-title">📅 Workshops</div>
                     <div id="count-workshops" class="stat-number">0</div>
-                    <p class="card-footer">Klik voor details →</p>
+                    <p style="color: var(--primary); font-weight: 700; font-size: 0.8rem;">Bekijk sessies →</p>
                 </div>
                 <div class="card clickable-card" onclick="navigateTo('contacts')">
-                    <div class="card-title">👥 Business Contacten</div>
+                    <div class="card-title">👥 Business CRM</div>
                     <div id="count-contacts" class="stat-number">0</div>
-                    <p class="card-footer">Klik voor details →</p>
+                    <p style="color: var(--primary); font-weight: 700; font-size: 0.8rem;">Bekijk champions →</p>
                 </div>
                 <div class="card clickable-card" onclick="navigateTo('updates')">
-                    <div class="card-title">📡 Nieuwe Updates</div>
+                    <div class="card-title">📡 Release Radar</div>
                     <div id="count-updates" class="stat-number">0</div>
-                    <p class="card-footer">Klik voor details →</p>
+                    <p style="color: var(--primary); font-weight: 700; font-size: 0.8rem;">Bekijk updates →</p>
+                </div>
+            </div>
+
+            <div style="margin-top: 48px;">
+                <h3 style="margin-bottom: 24px;">Strategische Focus</h3>
+                <div class="grid">
+                    <div class="card">
+                        <h4 class="section-label">Hoogste Impact Updates</h4>
+                        <div id="top-impact-list" style="margin-top: 16px;"></div>
+                    </div>
+                    <div class="card">
+                        <h4 class="section-label">Grootste Draagvlak (Votes)</h4>
+                        <div id="top-votes-list" style="margin-top: 16px;"></div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -48,7 +66,7 @@
         <!-- Workshops View -->
         <section id="view-workshops" class="view hidden">
             <div class="header-row">
-                <h2>Workshops & Sessies</h2>
+                <h2>Workshops & Kennissessies</h2>
                 <button class="btn btn-primary" onclick="showModal('workshop-modal')">+ Nieuwe Sessie</button>
             </div>
             <div class="grid" id="workshops-grid"></div>
@@ -57,7 +75,7 @@
         <!-- Contacts View -->
         <section id="view-contacts" class="view hidden">
             <div class="header-row">
-                <h2>Business CRM (Champions)</h2>
+                <h2>Business Champions Network</h2>
                 <button class="btn btn-primary" onclick="showModal('contact-modal')">+ Nieuw Contact</button>
             </div>
             <div class="grid" id="contacts-grid"></div>
@@ -167,31 +185,91 @@
         </div>
     </div>
 
-    <!-- Update Modal -->
-    <div id="update-modal" class="modal">
-        <div class="modal-content">
-            <h3>Nieuwe Update Toevoegen</h3><br>
-            <form id="update-form">
-                <div class="form-group">
-                    <label>Titel</label>
-                    <input type="text" name="title" required>
+    <!-- Update Detail Modal -->
+    <div id="update-detail-modal" class="modal">
+        <div class="modal-content" style="max-width: 1000px; padding: 0; overflow: hidden;">
+            <div style="display: flex; height: 80vh;">
+                <!-- Left Sidebar -->
+                <div style="width: 320px; background: #f8fafc; border-right: 1px solid var(--border); padding: 32px; overflow-y: auto;">
+                    <button class="btn btn-secondary" style="width: 100%; margin-bottom: 24px;" onclick="hideModal('update-detail-modal')">← Terug naar Radar</button>
+                    
+                    <h4 class="section-label">Strategische Scores</h4>
+                    <div class="form-group">
+                        <label>Impact (1-5)</label>
+                        <input type="number" id="detail-impact-score" min="1" max="5">
+                    </div>
+                    <div class="form-group">
+                        <label>Complexiteit (1-5)</label>
+                        <input type="number" id="detail-complexity-score" min="1" max="5">
+                    </div>
+                    <div class="form-group">
+                        <label>Readiness (1-5)</label>
+                        <input type="number" id="detail-readiness-score" min="1" max="5">
+                    </div>
+
+                    <h4 class="section-label" style="margin-top: 32px;">Doelgroep Tags</h4>
+                    <input type="text" id="detail-audience" placeholder="bijv. Infra, Projectleiders" style="width: 100%; padding: 12px; border-radius: 12px; border: 2px solid var(--border);">
+                    
+                    <div id="vote-section" style="margin-top: 32px; text-align: center; background: white; padding: 24px; border-radius: 20px; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                        <p style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Business Draagvlak</p>
+                        <div id="detail-vote-count" style="font-size: 2.5rem; font-weight: 800; margin: 8px 0; color: var(--secondary);">0</div>
+                        <button id="vote-btn" class="btn btn-secondary" style="width: 100%;">👍 Stemmen</button>
+                    </div>
+
+                    <button id="plan-workshop-btn" class="btn btn-primary" style="width: 100%; margin-top: 24px; padding: 16px;">📅 Plan Workshop</button>
                 </div>
-                <div class="form-group">
-                    <label>Categorie</label>
-                    <select name="category">
-                        <option value="General">Algemeen</option>
-                        <option value="Copilot">Copilot</option>
-                        <option value="Copilot Studio">Copilot Studio</option>
-                        <option value="Power Platform">Power Platform</option>
-                    </select>
+
+                <!-- Main Content -->
+                <div style="flex: 1; padding: 48px; overflow-y: auto;">
+                    <div style="border-bottom: 2px solid var(--border); padding-bottom: 24px; margin-bottom: 32px;">
+                        <span id="detail-category" class="badge badge-warning"></span>
+                        <h2 id="detail-title" style="margin-top: 16px; font-size: 2.2rem;"></h2>
+                        <p id="detail-date" style="color: var(--text-muted); font-weight: 600; margin-top: 8px;"></p>
+                    </div>
+
+                    <div style="margin-bottom: 40px;">
+                        <h4 class="section-label">BAM Impact & Scenario</h4>
+                        <p id="detail-impact" style="font-size: 1.15rem; line-height: 1.7; font-weight: 500;"></p>
+                    </div>
+
+                    <div class="grid" style="margin-top: 32px; grid-template-columns: 1fr 1fr;">
+                        <div style="background: #f1f5f9; padding: 32px; border-radius: 20px;">
+                            <h4 class="section-label">BAM Use Case</h4>
+                            <textarea id="detail-use-case" style="width: 100%; height: 120px; border: none; background: transparent; font-family: inherit; font-size: 1rem;" placeholder="Welk probleem bij BAM lost dit op? Beschrijf een concreet scenario..."></textarea>
+                        </div>
+                        <div style="background: #f0fdf4; padding: 32px; border-radius: 20px;">
+                            <h4 class="section-label">Actieplan (Checklist)</h4>
+                            <div id="action-plan-container"></div>
+                            <button class="btn btn-secondary" style="font-size: 0.75rem; padding: 6px 12px; margin-top: 12px;" onclick="addActionItem()">+ Taak toevoegen</button>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 40px;">
+                        <h4 class="section-label">AI Samenvatting (Microsoft Bronnen)</h4>
+                        <div style="background: #f8fafc; padding: 24px; border-radius: 16px; border-left: 4px solid var(--primary);">
+                            <p id="detail-summary" style="font-size: 0.95rem; line-height: 1.6; color: var(--text-main);"></p>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 40px;">
+                        <h4 class="section-label">📺 YouTube Video Link</h4>
+                        <div style="display: flex; gap: 12px;">
+                            <input type="text" id="detail-yt-link" placeholder="YouTube URL" style="flex: 1; padding: 14px; border-radius: 12px; border: 2px solid var(--border);">
+                            <button id="find-video-btn" class="btn btn-secondary" style="white-space: nowrap;">✨ Zoek Video</button>
+                        </div>
+                        <a id="detail-link" href="#" target="_blank" style="color: var(--primary); font-size: 0.85rem; display: block; margin-top: 12px; font-weight: 700;">Bekijk officiële roadmap bron →</a>
+                    </div>
+
+                    <div style="margin-top: 40px;">
+                        <h4 class="section-label">Mijn Persoonlijke Aantekeningen</h4>
+                        <textarea id="detail-notes" style="width: 100%; height: 120px; padding: 16px; border-radius: 16px; border: 2px solid var(--border); font-family: inherit;"></textarea>
+                    </div>
+
+                    <div style="margin-top: 48px; text-align: right; border-top: 2px solid var(--border); padding-top: 32px;">
+                        <button id="save-all-btn" class="btn btn-primary" style="padding: 18px 48px; font-size: 1.2rem; box-shadow: 0 10px 20px rgba(242, 101, 34, 0.2);">✅ Alles Opslaan</button>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>BAM Impact</label>
-                    <textarea name="bam_impact"></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary">Opslaan</button>
-                <button type="button" class="btn" onclick="hideModal('update-modal')">Annuleren</button>
-            </form>
+            </div>
         </div>
     </div>
 
